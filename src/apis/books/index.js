@@ -31,9 +31,26 @@ postsRouter.get("/" , (req,res,next) => {
     }
     }
 )
-postsRouter.get("/:postId" , (req,res,next) => {})
-postsRouter.put("/:postId" , (req,res,next) => {})
-postsRouter.delete("/:postId" , (req,res,next) => {})
+postsRouter.get("/:postId" , (req,res,next) => {
+    const posts = getPosts()
+    const foundPost = posts.find(post => post._id === req.params.postId)
+    res.send(foundPost)
+})
+postsRouter.put("/:postId" , (req,res,next) => {
+    const posts = getPosts()
+    const index = posts.findIndex(post => post._id === req.params.postId)
+    const oldPost = posts[index]
+    const updatedPost = {...oldPost , ...req.body , updatedAt : new  Date()}
+    posts[index] = updatedPost
+    writePosts(posts);
+    res.send(updatedPost);
+})
+postsRouter.delete("/:postId" , (req,res,next) => {
+    const posts = getPosts();
+    const remainingPosts = posts.filter(post => post._id !== req.params.postId);
+    writePosts(remainingPosts);
+    res.status(204).send()
+})
 
 
 export default postsRouter
